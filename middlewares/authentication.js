@@ -1,5 +1,5 @@
 const { VerifyToken } = require('../helpers/jwt');
-const { User } = require('../sequelize');
+const { Auth } = require('../sequelize');
 
 async function Authenticate(req, res, next) {
 	try {
@@ -10,12 +10,12 @@ async function Authenticate(req, res, next) {
 			});
 		} else {
 			const decoded = VerifyToken(access_token);
-			const user = await User.findOne({
+			const auth = await Auth.findOne({
 				where: {
 					email: decoded.email,
 				},
 			});
-			if (!user) {
+			if (!auth) {
 				res.status(404).json({ msg: 'Id Not Found' });
 			} else {
 				req.decoded = decoded;
@@ -37,13 +37,13 @@ async function AuthenticateSeller(req, res, next) {
 			});
 		} else {
 			const decoded = VerifyToken(access_token);
-			const user = await User.findOne({
+			const auth = await Auth.findOne({
 				where: {
 					email: decoded.email,
 					role: 'seller',
 				},
 			});
-			if (!user) {
+			if (!auth) {
 				res.status(404).json({ msg: 'Id Not Found' });
 			} else {
 				req.decoded = decoded;
@@ -65,12 +65,12 @@ async function AuthenticateResetToken(req, res, next) {
 			});
 		} else {
 			const decoded = VerifyToken(reset_password_token);
-			const user = await User.findOne({
+			const auth = await Auth.findOne({
 				where: {
 					email: decoded.data.email,
 				},
 			});
-			if (!user) {
+			if (!auth) {
 				res.status(404).json({ msg: 'Id Not Found' });
 			} else {
 				req.decoded = decoded;
