@@ -1,0 +1,9 @@
+# custom:
+#   webpack:
+#     includeModules:
+#       forceInclude:
+#         - pg
+custom:
+  webpackIncludeModules:
+    forceInclude:
+      - pg
