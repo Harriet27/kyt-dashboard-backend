@@ -2,7 +2,7 @@ module.exports = (sequelize, type) => {
 	return sequelize.define(
 		'auth',
 		{
-			id: {
+			user_id: {
 				type: type.INTEGER,
 				primaryKey: true,
 				autoIncrement: true,
@@ -50,7 +50,7 @@ module.exports = (sequelize, type) => {
 					notNull: true,
 					notEmpty: true,
 					len: {
-						args: 7,
+						args: 3,
 						msg: 'Password must be atleast 7 characters in length',
 					},
 				},
