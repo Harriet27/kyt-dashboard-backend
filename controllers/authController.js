@@ -6,6 +6,25 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 
 class Controller {
+	static async register(req, res, next) {
+		try {
+			const obj = {
+				username: req.body.username,
+				email: req.body.email,
+				password: Hash(req.body.password),
+				role: false,
+				verified: false,
+			};
+			const user = await Auth.create(obj);
+			return res.status(201).json({
+				message: 'suscces register an acount',
+			});
+		} catch (err) {
+			// console.log(user)
+			// console.log(err)
+			next(err);
+		}
+	}
 	static async login(req, res, next) {
 		try {
 			const input = {
@@ -21,14 +40,13 @@ class Controller {
 				res.status(401).json({
 					message: 'Wrong email or Password',
 				});
-				// } else if (!CompareHash(input.password, auth.password)) {
-			} else if (input.password !== auth.password) {
+			} else if (!CompareHash(input.password, auth.password)) {
 				res.status(401).json({
 					message: 'Wrong Password',
 				});
 			} else {
 				const decoded = SignToken({
-					id: auth.id,
+					user_id: auth.user_id,
 					username: auth.username,
 					email: auth.email,
 					password: auth.password,
