@@ -54,13 +54,18 @@ class Controller {
 					verified: auth.verified,
 				});
 				res.status(200).json({
+          message: 'Login successful!',
+          status: 200,
 					access_token: decoded,
 					verified: auth.verified === 1 ? true : false,
 				});
 			}
 		} catch (err) {
-			// console.log(err,'errornya')
-			next(err);
+			console.log(err,'errornya')
+      res.status(500).send({
+					status: 500,
+					message: err,
+				});
 		}
 	}
 	static info(req, res, next) {
