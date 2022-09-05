@@ -3,7 +3,7 @@ const router = express.Router();
 const cloudinary = require('cloudinary').v2;
 const fileUploader = require('../helpers/cloudinary.config');
 
-router.post('/', fileUploader.single('image'), (req, res, next) => {
+router.post('/', fileUploader.single('post_image'), (req, res, next) => {
   if (!req.file) {
     next(new Error('No file uploaded!'));
     return;
@@ -11,6 +11,7 @@ router.post('/', fileUploader.single('image'), (req, res, next) => {
   res.status(200).json({
     status: 200,
     message: 'Upload to cloud success!',
+    img_id: req.file.path.split("/")[req.file.path.split("/").length-1].split(".")[0],
     img_url: req.file.path,
   });
 });
