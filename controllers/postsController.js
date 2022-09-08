@@ -64,8 +64,55 @@ const create = async (req, res, next) => {
   })
 };
 
+const update = async (req, res, next) => {
+  const post_id = req.params.post_id;
+  postsService.findByID(post_id)
+  .then(docs => {
+    if (docs == null) {
+      return res.status(404).json({
+        message: "Post ID not found",
+      });
+    } else {
+      const dataUpdate = {
+        image: req.body.image,
+        image_name: req.body.image_name,
+        title: req.body.title,
+        description: req.body.description,
+      };
+      postsService.update(post_id, dataUpdate)
+      .then(update => {
+        if (update) {
+          res.status(200).json({
+            message: 'Post updated',
+            dataUpdate: dataUpdate,
+            request: {
+              type: "PUT",
+              url: "/posts/update" + post_id,
+            },
+          });
+        } else {
+          throw {
+            name: "Validation_error",
+            statusCode: 404,
+            message: `Post with id: ${post_id} is not found`,
+          };
+        }
+      })
+      .catch(err => {
+        next(err);
+      })
+    }
+  })
+  .catch(err => {
+    res.status(500).json({
+      error: err,
+    });
+  })
+};
+
 module.exports = {
   get,
   getByID,
   create,
+  update,
 };

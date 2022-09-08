@@ -40,8 +40,44 @@ const create = (data) => {
   })
 };
 
+const update = async (id, data) => {
+  return Posts.update(data, {
+    where: {
+      post_id: id,
+    }
+  })
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch(err => {
+    return err;
+  })
+};
+
+
+const findByID = (id) => {
+  return Posts.findOne({
+    where: {
+      post_id: id,
+    },
+  })
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch(err => {
+    return err;
+  })
+};
+
+
 module.exports = {
   get,
   getByID,
   create,
+  update,
+  findByID
 };
