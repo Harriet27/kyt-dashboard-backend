@@ -110,9 +110,42 @@ const update = async (req, res, next) => {
   })
 };
 
+const deleteById = async (req, res, next) => {
+  const post_id = req.query.post_id;
+  await postsService.findByID(post_id)
+  .then(docs => {
+    if (docs == null) {
+      return res.status(404).json({
+        message: "Post ID not found",
+      });
+    } else {
+      postsService.deleteById(post_id)
+      .then(results => {
+        res.status(200).json({
+          message: 'Post data deleted',
+          dataUpdate: results,
+          request: {
+            type: "Delete", 
+            url: "/posts/delete?post_id=" + post_id,
+          }
+        });
+      })
+      .catch(err => {
+        next(err);
+      })
+    }
+  })
+  .catch(err => {
+    res.status(500).json({
+      error: err,
+    });
+  })
+}
+
 module.exports = {
   get,
   getByID,
   create,
   update,
+  deleteById,
 };

@@ -56,6 +56,21 @@ const update = async (id, data) => {
   })
 };
 
+const deleteById = (id) => {
+  return Posts.destroy({
+    where: {
+      post_id: id,
+    },
+  })
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch((err) => {
+    return err;
+  })
+};
 
 const findByID = (id) => {
   return Posts.findOne({
@@ -79,5 +94,6 @@ module.exports = {
   getByID,
   create,
   update,
+  deleteById,
   findByID
 };
