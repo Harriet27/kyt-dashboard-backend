@@ -42,8 +42,8 @@ const getPostComment = async (req, res, next) => {
   .then((docs) => {
     return res.status(200).json({
       message: "Success!",
-      total: docs.data[0].length,
-      data: docs.data[0],
+      total_comments: docs.data[0].length,
+      comments: docs.data[0],
     });
   })
   .catch((err) => {

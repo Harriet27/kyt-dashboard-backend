@@ -50,11 +50,11 @@ const getPostComment = (req) => {
   const query = `
     select 
       c.comment_id,
-      c.name as comment_name,
-      c.comment as comment_post,
-      c.date as comment_date,
-      c.like as comment_like,
-      c.dislike as comment_dislike 
+      c.name,
+      c.comment,
+      c.date,
+      c.like,
+      c.dislike 
         from posts p 
         left join comments c on c.post_id = p.post_id 
           ${whereClause}
