@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 
 const AuthModel = require('./models/auth');
 const PostsModel = require('./models/posts');
+const CommentsModel = require('./models/comments');
 
 const env = process.env.NODE_ENV || 'development';
 // const env = process.env.NODE_ENV || 'production';
@@ -11,8 +12,10 @@ const sequelize = new Sequelize(config.DB_NAME, config.DB_USER, config.DB_PWD, c
 
 const Auth = AuthModel(sequelize, Sequelize);
 const Posts = PostsModel(sequelize, Sequelize);
+const Comments = CommentsModel(sequelize, Sequelize);
 
 module.exports = {
-	Auth,
+  Auth,
   Posts,
+  Comments,
 };
