@@ -1,12 +1,12 @@
 const postsService = require("../services/postsService");
 
 const get = async (req, res, next) => {
-  postsService.get()
+  postsService.get(req)
   .then((docs) => {
     return res.status(200).json({
       message: "Success!",
-      total: docs.data.length,
-      data: docs.data,
+      total: docs.data[0].length,
+      data: docs.data[0],
     });
   })
   .catch((err) => {
