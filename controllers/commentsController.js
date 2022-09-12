@@ -1,7 +1,7 @@
 const commentsService = require("../services/commentsService");
 
-const get = async (req, res, next) => {
-  commentsService.get()
+const getAll = async (req, res, next) => {
+  commentsService.getAll()
   .then((docs) => {
     return res.status(200).json({
       message: "Success!",
@@ -12,11 +12,32 @@ const get = async (req, res, next) => {
   .catch((err) => {
     res.status(500).json({
       status: err,
-      message: "data Getting Failed",
+      message: "data getting Failed",
+    });
+  })
+};
+
+const getByID = async (req, res, next) => {
+  const {
+    comment_id,
+  } = req.params;
+  commentsService.getByID(comment_id)
+  .then((docs) => {
+    return res.status(200).json({
+      message: "Success!",
+      total: docs.data.length,
+      data: docs.data[0][0],
+    });
+  })
+  .catch((err) => {
+    res.status(500).json({
+      status: err,
+      message: "data getting Failed",
     });
   })
 };
 
 module.exports = {
-  get,
+  getAll,
+  getByID,
 };

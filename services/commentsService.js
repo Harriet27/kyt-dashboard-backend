@@ -1,9 +1,29 @@
 const { Op } = require("sequelize");
 const { Comments } = require("../sequelize");
 
-const get = (req) => {
+const getAll = (req) => {
   const query = `
-    select * from comments
+    SELECT * FROM comments
+  `;
+  return Comments.sequelize.query(
+    query,
+    {
+      type: Op.SELECT,
+    }
+  )
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch((err) => {
+    return err;
+  })
+};
+
+const getByID = (req) => {
+  const query = `
+    SELECT * FROM comments WHERE comment_id = ${req}
   `;
   return Comments.sequelize.query(
     query,
@@ -22,5 +42,6 @@ const get = (req) => {
 };
 
 module.exports = {
-  get,
+  getAll,
+  getByID,
 };
