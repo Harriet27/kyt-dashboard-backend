@@ -1,7 +1,19 @@
 const { Op } = require("sequelize");
 const { Posts } = require("../sequelize");
 
-const get = (req) => {
+const get = () => {
+  return Posts.findAll()
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch((err) => {
+    return err;
+  })
+};
+
+const getWithComment = (req) => {
   const post_id = req.query.post_id ? `p.post_id = ${req.query.post_id}` : '';
   const whereClause = 
     post_id
@@ -119,6 +131,7 @@ const findByID = (id) => {
 
 module.exports = {
   get,
+  getWithComment,
   getByID,
   create,
   update,
