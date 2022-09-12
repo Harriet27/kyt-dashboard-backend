@@ -17,23 +17,6 @@ const get = async (req, res, next) => {
   })
 };
 
-const getWithComment = async (req, res, next) => {
-  postsService.getWithComment(req)
-  .then((docs) => {
-    return res.status(200).json({
-      message: "Success!",
-      total: docs.data[0].length,
-      data: docs.data[0],
-    });
-  })
-  .catch((err) => {
-    res.status(500).json({
-      status: err,
-      message: "data Getting Failed",
-    });
-  })
-};
-
 const getByID = async (req, res, next) => {
   const post_id = req.params.post_id;
   postsService.getByID(post_id)
@@ -161,7 +144,6 @@ const deleteById = async (req, res, next) => {
 
 module.exports = {
   get,
-  getWithComment,
   getByID,
   create,
   update,

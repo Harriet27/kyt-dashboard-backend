@@ -37,7 +37,25 @@ const getByID = async (req, res, next) => {
   })
 };
 
+const getPostComment = async (req, res, next) => {
+  commentsService.getPostComment(req)
+  .then((docs) => {
+    return res.status(200).json({
+      message: "Success!",
+      total: docs.data[0].length,
+      data: docs.data[0],
+    });
+  })
+  .catch((err) => {
+    res.status(500).json({
+      status: err,
+      message: "data Getting Failed",
+    });
+  })
+};
+
 module.exports = {
   getAll,
   getByID,
+  getPostComment,
 };
