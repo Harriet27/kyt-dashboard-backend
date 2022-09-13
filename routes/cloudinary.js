@@ -8,10 +8,13 @@ router.post('/', fileUploader.single('post_image'), (req, res, next) => {
     next(new Error('No file uploaded!'));
     return;
   }
+  function extractImgID(str) {
+    return str.split("/")[req.file.path.split("/").length-1].split(".")[0];
+  };
   res.status(200).json({
     status: 200,
     message: 'Upload to cloud success!',
-    img_id: req.file.path.split("/")[req.file.path.split("/").length-1].split(".")[0],
+    img_id: extractImgID(req.file.path),
     img_url: req.file.path,
   });
 });
