@@ -102,9 +102,45 @@ const getPostCommentNew = async (req, res, next) => {
   })
 };
 
+const create = (req, res, next) => {
+  const data = {
+    name: req.body.name,
+    comment: req.body.comment,
+    date: new Date(),
+    like: req.body.like,
+    dislike: req.body.dislike,
+    post_id: req.body.post_id,
+  };
+  commentsService.create(data)
+  .then((result) => {
+    const response = {
+      status: "Success",
+      message: "Successfully create comment",
+      results: result,
+      request: {
+        type: "POST",
+        url: "/comments/create",
+      },
+    };
+    if (result) {
+      res.status(200).json(response);
+    } else {
+      res.status(404).json({
+        message: `id not found!`
+      });
+    }
+  })
+  .catch(err => {
+    res.status(500).json({
+      error: err,
+    });
+  })
+};
+
 module.exports = {
   getAll,
   getByID,
   getPostCommentNew,
   getPostCommentOld,
+  create,
 };

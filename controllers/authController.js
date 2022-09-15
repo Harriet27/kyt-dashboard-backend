@@ -17,7 +17,7 @@ class Controller {
 			};
 			const user = await Auth.create(obj);
 			return res.status(201).json({
-				message: 'suscces register an acount',
+				message: 'success register an account',
 			});
 		} catch (err) {
 			// console.log(user)
@@ -54,18 +54,18 @@ class Controller {
 					verified: auth.verified,
 				});
 				res.status(200).json({
-          message: 'Login successful!',
-          status: 200,
+					message: 'Login successful!',
+					status: 200,
 					access_token: decoded,
 					verified: auth.verified === 1 ? true : false,
 				});
 			}
 		} catch (err) {
 			console.log(err,'errornya')
-      res.status(500).send({
-					status: 500,
-					message: err,
-				});
+			res.status(500).send({
+				status: 500,
+				message: err,
+			});
 		}
 	}
 	static info(req, res, next) {
@@ -84,20 +84,20 @@ class Controller {
 				email: email,
 			},
 		})
-			.then((result) => {
-				const token = jwt.sign({ data: result }, process.env.SECRET);
-				res.status(200).send({
-					status: 200,
-					message: 'Email matched',
-					data_token: token,
-				});
-			})
-			.catch((err) => {
-				res.status(500).send({
-					status: 500,
-					message: err,
-				});
+		.then((result) => {
+			const token = jwt.sign({ data: result }, process.env.SECRET);
+			res.status(200).send({
+				status: 200,
+				message: 'Email matched',
+				data_token: token,
 			});
+		})
+		.catch((err) => {
+			res.status(500).send({
+				status: 500,
+				message: err,
+			});
+		});
 	}
 	static resetPassword(req, res, next) {
 		const newPassword = Hash(req.body.newPassword);

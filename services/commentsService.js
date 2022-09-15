@@ -75,8 +75,21 @@ const getPostComment = (req) => {
   })
 };
 
+const create = (body) => {
+  return Comments.create(body)
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch((err) => {
+    return err;
+  })
+};
+
 module.exports = {
   getAll,
   getByID,
   getPostComment,
+  create,
 };
