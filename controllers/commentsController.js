@@ -79,14 +79,17 @@ const getPostComment = async (req, res, next) => {
       var analysis = response.data.map(item => {
         return item.classifications.map(({ tag_name, confidence }) => {
           return { tag_name, confidence };
-        })
+        });
       });
       const flatAnalysis = analysis.flat();
+      const commentWithAnalysis = commentsData.map((val, i) => {
+        return Object.assign({}, val, flatAnalysis[i]);
+      });
+      console.log(commentWithAnalysis);
       return res.status(200).send({
         message: "Success!",
         total_comments: commentsData.length,
-        comments: commentsData,
-        analysis: flatAnalysis,
+        comments: commentWithAnalysis,
       });
     } catch (err) {
       console.log("err", err);
