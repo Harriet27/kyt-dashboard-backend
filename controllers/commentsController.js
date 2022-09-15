@@ -38,26 +38,6 @@ const getByID = async (req, res, next) => {
   })
 };
 
-/*
-const getPostComment = async (req, res, next) => {
-  commentsService.getPostComment(req)
-  .then((docs) => {
-    const commentsData = docs.data[0];
-    return res.status(200).json({
-      message: "Success!",
-      total_comments: commentsData.length,
-      comments: commentsData,
-    });
-  })
-  .catch((err) => {
-    res.status(500).json({
-      status: err,
-      message: "data Getting Failed",
-    });
-  })
-};
-*/
-
 const getPostComment = async (req, res, next) => {
   commentsService.getPostComment(req)
   .then(async (docs) => {
@@ -85,7 +65,6 @@ const getPostComment = async (req, res, next) => {
       const commentWithAnalysis = commentsData.map((val, i) => {
         return Object.assign({}, val, flatAnalysis[i]);
       });
-      console.log(commentWithAnalysis);
       return res.status(200).send({
         message: "Success!",
         total_comments: commentsData.length,
