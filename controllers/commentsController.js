@@ -38,7 +38,26 @@ const getByID = async (req, res, next) => {
   })
 };
 
-const getPostComment = async (req, res, next) => {
+const getPostCommentOld = async (req, res, next) => {
+  commentsService.getPostComment(req)
+  .then((docs) => {
+    const commentsData = docs.data[0];
+    return res.status(200).json({
+      message: "Success!",
+      total_comments: commentsData.length,
+      comments: commentsData,
+    });
+  })
+  .catch((err) => {
+    console.log("err", err);
+    return res.status(500).json({
+      status: err,
+      message: "data Getting Failed",
+    });
+  })
+};
+
+const getPostCommentNew = async (req, res, next) => {
   commentsService.getPostComment(req)
   .then(async (docs) => {
     const commentsData = docs.data[0];
@@ -76,7 +95,7 @@ const getPostComment = async (req, res, next) => {
     }
   })
   .catch((err) => {
-    res.status(500).json({
+    return res.status(500).json({
       status: err,
       message: "data Getting Failed",
     });
@@ -86,5 +105,6 @@ const getPostComment = async (req, res, next) => {
 module.exports = {
   getAll,
   getByID,
-  getPostComment,
+  getPostCommentNew,
+  getPostCommentOld,
 };

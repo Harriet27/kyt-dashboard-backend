@@ -43,20 +43,20 @@ const getByID = (req) => {
 
 const getPostComment = (req) => {
   const post_id = req.params.post_id ? `p.post_id = ${req.params.post_id}` : '';
-  const whereClause = 
+  const whereClause =
     post_id
     ? `WHERE ${post_id}`
     : '';
   const query = `
-    select 
+    select
       c.comment_id,
       c.name,
       c.comment,
       c.date,
       c.like,
-      c.dislike 
-        from posts p 
-        left join comments c on c.post_id = p.post_id 
+      c.dislike
+        from posts p
+        left join comments c on c.post_id = p.post_id
           ${whereClause}
   `;
   return Comments.sequelize.query(
