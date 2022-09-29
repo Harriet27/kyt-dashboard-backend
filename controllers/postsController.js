@@ -140,7 +140,7 @@ const deleteById = async (req, res, next) => {
       error: err,
     });
   })
-}
+};
 
 module.exports = {
   get,

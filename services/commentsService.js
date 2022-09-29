@@ -87,9 +87,43 @@ const create = (body) => {
   })
 };
 
+const deleteById = (id) => {
+  return Comments.destroy({
+    where: {
+      comment_id: id,
+    },
+  })
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch((err) => {
+    return err;
+  })
+};
+
+const findByID = (id) => {
+  return Comments.findOne({
+    where: {
+      comment_id: id,
+    },
+  })
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch(err => {
+    return err;
+  })
+};
+
 module.exports = {
   getAll,
   getByID,
   getPostComment,
   create,
+  deleteById,
+  findByID,
 };

@@ -137,10 +137,43 @@ const create = (req, res, next) => {
   })
 };
 
+const deleteById = async (req, res, next) => {
+  const comment_id = req.query.comment_id;
+  await commentsService.findByID(comment_id)
+  .then(docs => {
+    if (docs == null) {
+      return res.status(404).json({
+        message: "Comment ID not found",
+      });
+    } else {
+      commentsService.deleteById(comment_id)
+      .then(results => {
+        res.status(200).json({
+          message: 'Comment deleted',
+          dataUpdate: results,
+          request: {
+            type: "Delete",
+            url: "/comments/delete?comment_id=" + comment_id,
+          }
+        });
+      })
+      .catch(err => {
+        next(err);
+      })
+    }
+  })
+  .catch(err => {
+    res.status(500).json({
+      error: err,
+    });
+  })
+};
+
 module.exports = {
   getAll,
   getByID,
   getPostCommentNew,
   getPostCommentOld,
   create,
+  deleteById,
 };
