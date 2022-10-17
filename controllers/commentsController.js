@@ -73,7 +73,7 @@ const getPostCommentNew = async (req, res, next) => {
       const response = await axios.post(
         `https://api.monkeylearn.com/v3/classifiers/${process.env.MONKEYLEARN_MODEL_ID_SA}/classify/`,
         body,
-        options
+        options,
       );
       var analysis = response.data.map(item => {
         return item.classifications.map(({ tag_name, confidence }) => {

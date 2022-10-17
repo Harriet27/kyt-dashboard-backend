@@ -87,6 +87,22 @@ const create = (body) => {
   })
 };
 
+const update = async (id, data) => {
+  return Comments.update(data, {
+    where: {
+      comment_id: id,
+    }
+  })
+  .then((docs) => {
+    return {
+      data: docs,
+    };
+  })
+  .catch(err => {
+    return err;
+  })
+};
+
 const deleteById = (id) => {
   return Comments.destroy({
     where: {
@@ -124,6 +140,7 @@ module.exports = {
   getByID,
   getPostComment,
   create,
+  update,
   deleteById,
   findByID,
 };
