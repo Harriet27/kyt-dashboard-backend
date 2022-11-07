@@ -29,9 +29,11 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemon": "^2.0.19",
     "pg": "^8.7.3",
+    "puppeteer": "^19.2.2",
     "request": "^2.88.2",
     "sequelize": "^6.21.3",
     "serverless-http": "^3.0.2",
-    "serverless-webpack": "^5.8.0"
+    "serverless-webpack": "^5.8.0",
+    "twitter": "^1.7.1"
   }
 }
