@@ -30,7 +30,7 @@ router.get('/playground', (req, res, next) => {
   })();
 });
 
-router.get('/linkedin-post-comments', (req, res, next) => {
+router.post('/linkedin-post-comments', (req, res, next) => {
   (async() => {
 
     console.log('Starting...');
@@ -48,6 +48,37 @@ router.get('/linkedin-post-comments', (req, res, next) => {
         comments: commentsArr,
       };
     });
+    console.log('data: ', data);
+    res.status(200).send(data);
+
+    debugger;
+
+    await browser.close();
+  })();
+});
+
+router.post('/twitter-post-stats', (req, res, next) => {
+  (async() => {
+
+    console.log('Starting...');
+    const url = req.query.url;
+
+    let browser = await puppeteer.launch();
+    let page = await browser.newPage();
+    console.log('Opening page...');
+
+    await page.goto(url, { waitUntil: 'networkidle2' });
+
+    let data = await page.evaluate((url) => {
+      let retweetsNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/retweets"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
+      let quoteTweetsNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/retweets/with_comments"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
+      let likesNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/likes"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
+      return {
+        retweets: retweetsNum,
+        quoteTweets: quoteTweetsNum,
+        likes: likesNum,
+      };
+    }, url);
     console.log('data: ', data);
     res.status(200).send(data);
 
