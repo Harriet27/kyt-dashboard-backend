@@ -88,4 +88,31 @@ router.post('/twitter-post-stats', (req, res, next) => {
   })();
 });
 
+router.post('/twitter-post-comments', (req, res, next) => {
+  (async() => {
+
+    console.log('Starting...');
+    const url = req.query.url;
+
+    let browser = await puppeteer.launch();
+    let page = await browser.newPage();
+    console.log('Opening page...');
+
+    await page.goto(url, { waitUntil: 'networkidle2' });
+
+    let data = await page.evaluate(() => {
+      let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map(i => i.innerText);
+      return {
+        replies: repliesNum,
+      };
+    });
+    console.log('data: ', data);
+    res.status(200).send(data);
+
+    debugger;
+
+    await browser.close();
+  })();
+});
+
 module.exports = router;
