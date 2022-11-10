@@ -42,7 +42,7 @@ router.post('/linkedin-post-comments', (req, res, next) => {
 
     await page.goto(url, { waitUntil: 'networkidle2' });
 
-    let data = await page.evaluate((body) => {
+    let data = await page.evaluate(() => {
       let commentsArr = [...document.querySelectorAll("div[class='attributed-text-segment-list__container relative mt-1 mb-1.5']>p[dir='ltr']:not(p[data-test-id='main-feed-activity-card__commentary'])")].map(i => i.innerText);
       return {
         comments: commentsArr,
@@ -74,6 +74,7 @@ router.post('/twitter-post-stats', (req, res, next) => {
       let quoteTweetsNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/retweets/with_comments"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
       let likesNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/likes"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
       return {
+        tweet_id: url.split('/')[url.split('/').length-1],
         retweets: retweetsNum,
         quoteTweets: quoteTweetsNum,
         likes: likesNum,
@@ -100,11 +101,50 @@ router.post('/twitter-post-comments', (req, res, next) => {
 
     await page.goto(url, { waitUntil: 'networkidle2' });
 
-    let data = await page.evaluate(() => {
+    let data = await page.evaluate((url) => {
       let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map(i => i.innerText);
       return {
+        tweet_id: url.split('/')[url.split('/').length-1],
         replies: repliesNum,
       };
+    }, url);
+    console.log('data: ', data);
+    res.status(200).send(data);
+
+    debugger;
+
+    await browser.close();
+  })();
+  /*
+  (async() => {
+
+    console.log('Starting...');
+    const url = req.query.url;
+
+    let browser = await puppeteer.launch();
+    let page = await browser.newPage();
+    console.log('Opening page...');
+
+    await page.goto(url, { waitUntil: 'networkidle2' });
+
+    let data = await page.evaluate(() => {
+      if ((document.scrollingElement.scrollTop + window.innerHeight) < document.scrollingElement.scrollHeight) {
+        console.log('scrolling...');
+        const distance = document.body.scrollHeight;
+        const delay = 750;
+        const timer = setInterval(() => {
+          document.scrollingElement.scrollBy(0, distance);
+          if (document.scrollingElement.scrollTop + window.innerHeight >= document.scrollingElement.scrollHeight) {
+            clearInterval(timer);
+          }
+        }, delay);
+      } else {
+        console.log('finished scrolling!');
+        let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map(i => i.innerText);
+        return {
+          replies: repliesNum,
+        };
+      }
     });
     console.log('data: ', data);
     res.status(200).send(data);
@@ -113,6 +153,7 @@ router.post('/twitter-post-comments', (req, res, next) => {
 
     await browser.close();
   })();
+  */
 });
 
 module.exports = router;
