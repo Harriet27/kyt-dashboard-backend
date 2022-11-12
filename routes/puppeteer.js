@@ -43,7 +43,7 @@ router.post('/linkedin-post-comments', (req, res, next) => {
     console.log('Page opened!');
 
     let data = await page.evaluate(() => {
-      let commentsArr = [...document.querySelectorAll("div[class='attributed-text-segment-list__container relative mt-1 mb-1.5']>p[dir='ltr']:not(p[data-test-id='main-feed-activity-card__commentary'])")].map(i => i.innerText);
+      let commentsArr = [...document.querySelectorAll("div[class='attributed-text-segment-list__container relative mt-1 mb-1.5']>p[dir='ltr']:not(p[data-test-id='main-feed-activity-card__commentary'])")].map((i) => i.innerText);
       return {
         comments: commentsArr,
       };
@@ -146,7 +146,7 @@ router.post('/twitter-post-comments', (req, res, next) => {
     console.log('Page opened!');
 
     let data = await page.evaluate((url) => {
-      let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map(i => i.innerText);
+      let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
       return {
         tweet_id: url.split('/')[url.split('/').length-1],
         replies: repliesNum,
@@ -184,7 +184,7 @@ router.post('/twitter-post-comments', (req, res, next) => {
         }, delay);
       } else {
         console.log('finished scrolling!');
-        let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map(i => i.innerText);
+        let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
         return {
           replies: repliesNum,
         };
