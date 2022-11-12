@@ -57,6 +57,23 @@ router.post('/linkedin-post-comments', (req, res, next) => {
   })();
 });
 
+router.post('/twitter-search', (req, res, next) => {
+  const query = req.body.query.join('%20OR%20');
+  const from = req.body.from;
+  /*
+    Example URL 1 (OR Operator):
+    > (MH370 OR crash) (from:MAS) (@MAS)
+    https://twitter.com/search?q=(MH370%20OR%20crash)%20(from%3AMAS)%20(%40MAS)&src=typed_query
+    Example URL 1 (AND Operator):
+    > MH370 crash (from:MAS) (@MAS)
+    https://twitter.com/search?q=MH370%20crash%20(from%3AMAS)%20(%40MAS)&src=typed_query
+  */
+  const url = `https://twitter.com/search?q=(${query})%20(from%3A${from})&src=typed_query`;
+  res.status(200).send({
+    link: url,
+  });
+});
+
 router.post('/twitter-post-stats', (req, res, next) => {
   (async() => {
 
