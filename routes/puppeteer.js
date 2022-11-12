@@ -67,10 +67,14 @@ router.post('/twitter-advanced-search-or', (req, res, next) => {
     https://twitter.com/search?q=MH370%20crash%20(from%3AMAS)%20(%40MAS)&src=typed_query
   */
   (async() => {
+    const encodeJoinUrl = (arr) => {
+      return arr.join('%20OR%20');
+    };
+
     console.log('Starting...');
-    const query = req.body.query.join('%20OR%20');
+    const query = req.body.query;
     const from = req.body.from;
-    const url = `https://twitter.com/search?q=(${query})%20(from%3A${from})&src=typed_query`;
+    const url = `https://twitter.com/search?q=(${encodeJoinUrl(query)})%20(from%3A${from})&src=typed_query`;
 
     let browser = await puppeteer.launch();
     let page = await browser.newPage();
