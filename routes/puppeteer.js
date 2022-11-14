@@ -72,9 +72,11 @@ router.post('/twitter-advanced-search-or', (req, res, next) => {
     };
 
     console.log('Starting...');
-    const query = req.body.query;
-    const from = req.body.from;
-    const url = `https://twitter.com/search?q=(${encodeJoinUrl(query)})%20(from%3A${from})&src=typed_query`;
+    const query = req.body.query; // array of strings
+    const from = req.body.from; // 1 account only
+    const since = req.body.since; // yyyy-mm-dd
+    const until = req.body.until; // yyyy-mm-dd
+    const url = `https://twitter.com/search?q=(${encodeJoinUrl(query)})%20(from%3A${from})%20until%3A${until}%20since%3A${since}&src=typed_query`;
 
     let browser = await puppeteer.launch();
     let page = await browser.newPage();
@@ -83,15 +85,17 @@ router.post('/twitter-advanced-search-or', (req, res, next) => {
     await page.goto(url, { waitUntil: 'networkidle2' });
     console.log('Page opened!');
 
-    let data = await page.evaluate((query, from, url) => {
+    let data = await page.evaluate((query, from, since, until, url) => {
       let tweet_id_arr = [...document.getElementsByTagName("time")].map((i) => i.parentElement.getAttributeNode("href").value);
       return {
         searched_query: query,
         searched_from: from,
-        searched_url: url,
-        tweet_id_arr: tweet_id_arr.map(i => i.split('/')[i.split('/').length-1]),
+        searched_since: since,
+        searched_until: until,
+        crawled_url: url,
+        tweet_id_results: tweet_id_arr.map(i => i.split('/')[i.split('/').length-1]),
       };
-    }, query, from, url);
+    }, query, from, since, until, url);
     console.log('data:', data);
     res.status(200).send(data);
 
