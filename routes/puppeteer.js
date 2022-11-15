@@ -87,13 +87,17 @@ router.post('/twitter-advanced-search-or', (req, res, next) => {
 
     let data = await page.evaluate((query, from, since, until, url) => {
       let tweet_id_arr = [...document.getElementsByTagName("time")].map((i) => i.parentElement.getAttributeNode("href").value);
+      let tweet_id_results = tweet_id_arr.map((i) => i.split('/')[i.split('/').length-1]);
+      let tweet_url_results = tweet_id_arr.map((i) => `https://twitter.com${i}`);
       return {
         searched_query: query,
         searched_from: from,
         searched_since: since,
         searched_until: until,
         crawled_url: url,
-        tweet_id_results: tweet_id_arr.map(i => i.split('/')[i.split('/').length-1]),
+        // tweet_id_results: tweet_id_arr.map((i) => i.split('/')[i.split('/').length-1]),
+        // tweet_url_results: tweet_id_arr.map((i) => `https://twitter.com${i}`),
+        results: tweet_url_results,
       };
     }, query, from, since, until, url);
     console.log('data:', data);
