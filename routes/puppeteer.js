@@ -141,7 +141,7 @@ router.post('/twitter-post-stats', (req, res, next) => {
   })();
 });
 
-router.post('/twitter-post-comments', (req, res, next) => {
+router.post('/twitter-post-replies', (req, res, next) => {
   (async() => {
     console.log('Starting...');
     const url = req.query.url;
@@ -167,7 +167,9 @@ router.post('/twitter-post-comments', (req, res, next) => {
 
     await browser.close();
   })();
-  /*
+});
+
+router.post('/twitter-post-replies-analised', async (req, res, next) => {
   (async() => {
     console.log('Starting...');
     const url = req.query.url;
@@ -179,33 +181,56 @@ router.post('/twitter-post-comments', (req, res, next) => {
     await page.goto(url, { waitUntil: 'networkidle2' });
     console.log('Page opened!');
 
-    let data = await page.evaluate(() => {
-      if ((document.scrollingElement.scrollTop + window.innerHeight) < document.scrollingElement.scrollHeight) {
-        console.log('scrolling...');
-        const distance = document.body.scrollHeight;
-        const delay = 750;
-        const timer = setInterval(() => {
-          document.scrollingElement.scrollBy(0, distance);
-          if (document.scrollingElement.scrollTop + window.innerHeight >= document.scrollingElement.scrollHeight) {
-            clearInterval(timer);
-          }
-        }, delay);
-      } else {
-        console.log('finished scrolling!');
-        let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
-        return {
-          replies: repliesNum,
-        };
-      }
-    });
-    console.log('data: ', data);
-    res.status(200).send(data);
+    let tweet_id = url.split('/')[url.split('/').length-1];
+
+    let repliesData = await page.evaluate((url) => {
+      let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
+      return {
+        tweet_id: url.split('/')[url.split('/').length-1],
+        replies: repliesNum,
+      };
+    }, url);
+    console.log('repliesData: ', repliesData);
 
     debugger;
 
     await browser.close();
+
+    const body = {
+      data: repliesData.replies,
+    };
+    const options = {
+      headers: {
+        "Authorization": `Token ${process.env.MONKEYLEARN_API_KEY}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `https://api.monkeylearn.com/v3/classifiers/${process.env.MONKEYLEARN_MODEL_ID_SA}/classify/`,
+        body,
+        options,
+      );
+      console.log('Sent to MonkeyLearn!', response);
+      var analysis = response.data.map(item => {
+        return item.classifications.map(({ tag_name, confidence }) => {
+          return { tag_name, confidence };
+        });
+      });
+      const flatAnalysis = analysis.flat();
+      const result = flatAnalysis.map((item1, idx) => {
+        item1["tweet"] = repliesData.replies[idx];
+        return item1;
+      });
+      console.log('Analysis finished');
+      return res.status(200).send({
+        tweet_id,
+        replies: result,
+      });
+    } catch (err) {
+      console.log("err", err);
+      return res.status(500).send(err);
+    }
   })();
-  */
 });
 
 module.exports = router;
