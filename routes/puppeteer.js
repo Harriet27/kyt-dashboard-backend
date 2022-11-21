@@ -210,9 +210,9 @@ router.post('/twitter-post-replies-analised', async (req, res, next) => {
         body,
         options,
       );
-      console.log('Sent to MonkeyLearn!', response);
+      console.log('Sent to MonkeyLearn!', response.data);
       var analysis = response.data.map(item => {
-        return item.classifications.map(({ tag_name, confidence }) => {
+        return item?.classifications?.map(({ tag_name, confidence }) => {
           return { tag_name, confidence };
         });
       });
@@ -221,7 +221,7 @@ router.post('/twitter-post-replies-analised', async (req, res, next) => {
         item1["tweet"] = repliesData.replies[idx];
         return item1;
       });
-      console.log('Analysis finished');
+      console.log('Analysis finished!');
       return res.status(200).send({
         tweet_id,
         replies: result,
