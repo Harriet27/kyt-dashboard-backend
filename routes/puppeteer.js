@@ -155,9 +155,14 @@ router.post('/twitter-post-replies', (req, res, next) => {
 
     let data = await page.evaluate((url) => {
       let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
+      let replyName = [...document.querySelectorAll('div[data-testid="User-Names"]')].slice(1).map((i) => {
+        let name = i.innerText;
+        return name.split('\n')[1];
+      });
       return {
         tweet_id: url.split('/')[url.split('/').length-1],
         replies: repliesNum,
+        user: replyName,
       };
     }, url);
     console.log('data: ', data);
@@ -185,9 +190,14 @@ router.post('/twitter-post-replies-analised', async (req, res, next) => {
 
     let repliesData = await page.evaluate((url) => {
       let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
+      let replyName = [...document.querySelectorAll('div[data-testid="User-Names"]')].slice(1).map((i) => {
+        let name = i.innerText;
+        return name.split('\n')[1];
+      });
       return {
         tweet_id: url.split('/')[url.split('/').length-1],
         replies: repliesNum,
+        user: replyName,
       };
     }, url);
     console.log('repliesData: ', repliesData);
@@ -218,8 +228,11 @@ router.post('/twitter-post-replies-analised', async (req, res, next) => {
       });
       const flatAnalysis = analysis.flat();
       const result = flatAnalysis.map((item1, idx) => {
-        item1["tweet"] = repliesData.replies[idx];
-        return item1;
+        return ({
+          ...item1,
+          tweet: repliesData.replies[idx],
+          user: repliesData.user[idx],
+        })
       });
       console.log('Analysis finished!');
       return res.status(200).send({
