@@ -189,15 +189,15 @@ router.post('/twitter-post-replies-analised', async (req, res, next) => {
     let tweet_id = url.split('/')[url.split('/').length-1];
 
     let repliesData = await page.evaluate((url) => {
-      let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
       let replyName = [...document.querySelectorAll('div[data-testid="User-Names"]')].slice(1).map((i) => {
         let name = i.innerText;
         return name.split('\n')[1];
       });
+      let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
       return {
         tweet_id: url.split('/')[url.split('/').length-1],
-        replies: repliesNum,
         user: replyName,
+        replies: repliesNum,
       };
     }, url);
     console.log('repliesData: ', repliesData);
@@ -237,6 +237,87 @@ router.post('/twitter-post-replies-analised', async (req, res, next) => {
       console.log('Analysis finished!');
       return res.status(200).send({
         tweet_id,
+        replies: result,
+      });
+    } catch (err) {
+      console.log("err", err);
+      return res.status(500).send(err);
+    }
+  })();
+});
+
+router.post('/twitter-post-stats-replies-analised', async (req, res, next) => {
+  (async() => {
+    console.log('Starting...');
+    const url = req.query.url;
+
+    let browser = await puppeteer.launch();
+    let page = await browser.newPage();
+    console.log('Opening page...');
+
+    await page.goto(url, { waitUntil: 'networkidle2' });
+    console.log('Page opened!');
+
+    let tweet_id = url.split('/')[url.split('/').length-1];
+
+    let repliesData = await page.evaluate((url) => {
+      let replyName = [...document.querySelectorAll('div[data-testid="User-Names"]')].slice(1).map((i) => {
+        let name = i.innerText;
+        return name.split('\n')[1];
+      });
+      let retweetsNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/retweets"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
+      let quoteTweetsNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/retweets/with_comments"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
+      let likesNum = document.querySelector(`a[href="${url.split("").slice(19).join("")}/likes"]`).querySelector('div').querySelector('span').querySelector('span').querySelector('span').innerText;
+      let repliesNum = [...document.querySelectorAll('div[data-testid="tweetText"]')].slice(1).map((i) => i.innerText);
+      return {
+        tweet_id: url.split('/')[url.split('/').length-1],
+        user: replyName,
+        retweets: retweetsNum,
+        quoteTweets: quoteTweetsNum,
+        likes: likesNum,
+        replies: repliesNum,
+      };
+    }, url);
+    console.log('repliesData: ', repliesData);
+
+    debugger;
+
+    await browser.close();
+
+    const body = {
+      data: repliesData.replies,
+    };
+    const options = {
+      headers: {
+        "Authorization": `Token ${process.env.MONKEYLEARN_API_KEY}`,
+      },
+    };
+    try {
+      const response = await axios.post(
+        `https://api.monkeylearn.com/v3/classifiers/${process.env.MONKEYLEARN_MODEL_ID_SA}/classify/`,
+        body,
+        options,
+      );
+      console.log('Sent to MonkeyLearn!', response.data);
+      var analysis = response.data.map(item => {
+        return item?.classifications?.map(({ tag_name, confidence }) => {
+          return { tag_name, confidence };
+        });
+      });
+      const flatAnalysis = analysis.flat();
+      const result = flatAnalysis.map((item1, idx) => {
+        return ({
+          ...item1,
+          tweet: repliesData.replies[idx],
+          user: repliesData.user[idx],
+        })
+      });
+      console.log('Analysis finished!');
+      return res.status(200).send({
+        tweet_id,
+        retweets: repliesData.retweets,
+        quoteTweets: repliesData.quoteTweets,
+        likes: repliesData.likes,
         replies: result,
       });
     } catch (err) {
