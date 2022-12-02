@@ -310,14 +310,17 @@ router.post('/twitter-post-stats-replies-analised', async (req, res, next) => {
           ...item1,
           tweet: repliesData.replies[idx],
           user: repliesData.user[idx],
-        })
+        });
       });
       console.log('Analysis finished!');
       return res.status(200).send({
         tweet_id,
-        retweets: repliesData.retweets,
-        quoteTweets: repliesData.quoteTweets,
-        likes: repliesData.likes,
+        stats: {
+          retweets: repliesData.retweets,
+          quoteTweets: repliesData.quoteTweets,
+          likes: repliesData.likes,
+        },
+        totalReplies: result.length,
         replies: result,
       });
     } catch (err) {
