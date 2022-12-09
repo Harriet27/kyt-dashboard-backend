@@ -17,4 +17,30 @@ router.get('/1', async (req, res, next) => {
   });
 });
 
+router.post('/full-archive-search', async (req, res, next) => {
+  const body = {
+    query: req.body.query,
+    maxResults: req.body.maxResults,
+    fromDate: req.body.fromDate,
+    toDate: req.body.toDate,
+  };
+  const options = {
+    headers: {
+      "Authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+    },
+  };
+  try {
+    const response = await axios.post(
+      `https://api.twitter.com/1.1/tweets/search/fullarchive/dev.json`,
+      body,
+      options
+    );
+    const data = response.data;
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+});
+
 module.exports = router;
