@@ -10,19 +10,38 @@ const client = new Twitter({
   access_token_secret: 'rsM52mRekTpwKVfvEdd4E2STEKA0vehuXpIh6mTzpGJKa', // ACCESS TOKEN SECRET
 });
 
-router.get('/1', async (req, res, next) => {
-  var tweetId = '1581695296043483139';
-  await client.get(`statuses/retweet/${tweetId}`, function (error, tweet, response) {
-    res.status(200).send(tweet);
-  });
-});
+/*
+  mas
+  {
+    "query":"from:mas lang:en",
+    "maxResults": "100",
+    "fromDate":"201403080000",
+    "toDate":"201404050000"
+  }
+  ------------------
+  flyethiopian
+  {
+    "query":"from:flyethiopian lang:en",
+    "maxResults": "100",
+    "fromDate":"201903100000",
+    "toDate":"201904070000"
+  }
+  ------------------
+  airasia
+  {
+    "query":"from:airasia lang:en",
+    "maxResults": "100",
+    "fromDate":"201412290000",
+    "toDate":"201501250000"
+  }
+*/
 
-router.post('/full-archive-search', async (req, res, next) => {
+router.get('/full-archive-search/mas', async (req, res, next) => {
   const body = {
-    query: req.body.query,
-    maxResults: req.body.maxResults,
-    fromDate: req.body.fromDate,
-    toDate: req.body.toDate,
+    "query":"from:mas lang:en",
+    "maxResults": "100",
+    "fromDate":"201403080000",
+    "toDate":"201404050000"
   };
   const options = {
     headers: {
@@ -36,7 +55,95 @@ router.post('/full-archive-search', async (req, res, next) => {
       options
     );
     const data = response.data;
-    return res.status(200).json(data);
+    const tweets = data.results.map(i => {
+      return {
+        tweet_id: i.id_str,
+        tweet: i.text,
+        name: i.user.name,
+        username: i.user.screen_name,
+      };
+    });
+    return res.status(200).send({
+      total: data.results.length,
+      // result: tweets,
+      data,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+});
+
+router.get('/full-archive-search/flyethiopian', async (req, res, next) => {
+  const body = {
+    "query":"from:flyethiopian lang:en",
+    "maxResults": "100",
+    "fromDate":"201903100000",
+    "toDate":"201904070000"
+  };
+  const options = {
+    headers: {
+      "Authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+    },
+  };
+  try {
+    const response = await axios.post(
+      `https://api.twitter.com/1.1/tweets/search/fullarchive/dev.json`,
+      body,
+      options
+    );
+    const data = response.data;
+    const tweets = data.results.map(i => {
+      return {
+        tweet_id: i.id_str,
+        tweet: i.text,
+        name: i.user.name,
+        username: i.user.screen_name,
+      };
+    });
+    return res.status(200).send({
+      total: data.results.length,
+      // result: tweets,
+      data,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+});
+
+router.get('/full-archive-search/airasia', async (req, res, next) => {
+  const body = {
+    "query":"from:airasia lang:en",
+    "maxResults": "100",
+    "fromDate":"201412290000",
+    "toDate":"201501250000"
+  };
+  const options = {
+    headers: {
+      "Authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+    },
+  };
+  try {
+    const response = await axios.post(
+      `https://api.twitter.com/1.1/tweets/search/fullarchive/dev.json`,
+      body,
+      options
+    );
+    const data = response.data;
+    const tweets = data.results.map(i => {
+      return {
+        tweet_id: i.id_str,
+        tweet: i.text,
+        name: i.user.name,
+        username: i.user.screen_name,
+      };
+    });
+    return res.status(200).send({
+      total: data.results.length,
+      // result: tweets,
+      data,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
