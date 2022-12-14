@@ -36,12 +36,51 @@ const client = new Twitter({
   }
 */
 
+router.post('/full-archive-search', async (req, res, next) => {
+  const body = {
+    "query":`from:${req.body.user} lang:en`,
+    "maxResults": `${req.body.maxResults}`,
+    "fromDate":`${req.body.fromYear}${req.body.fromMonth}${req.body.fromDate}0000`,
+    "toDate":`${req.body.toYear}${req.body.toMonth}${req.body.toDate}0000`,
+  };
+  const options = {
+    headers: {
+      "Authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
+    },
+  };
+  try {
+    const response = await axios.post(
+      `https://api.twitter.com/1.1/tweets/search/fullarchive/dev.json`,
+      body,
+      options
+    );
+    const data = response.data;
+    const tweets = data.results.map(i => {
+      return {
+        url: `https://twitter.com/i/web/status/${i.id_str}`,
+        tweet_id: i.id_str,
+        tweet: i.text,
+        name: i.user.name,
+        username: i.user.screen_name,
+      };
+    });
+    return res.status(200).send({
+      total: data.results.length,
+      result: tweets,
+      // data,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+});
+
 router.get('/full-archive-search/mas', async (req, res, next) => {
   const body = {
     "query":"from:mas lang:en",
     "maxResults": "100",
     "fromDate":"201403080000",
-    "toDate":"201404050000"
+    "toDate":"201404050000",
   };
   const options = {
     headers: {
@@ -65,8 +104,8 @@ router.get('/full-archive-search/mas', async (req, res, next) => {
     });
     return res.status(200).send({
       total: data.results.length,
-      // result: tweets,
-      data,
+      result: tweets,
+      // data,
     });
   } catch (err) {
     console.log(err);
@@ -79,7 +118,7 @@ router.get('/full-archive-search/flyethiopian', async (req, res, next) => {
     "query":"from:flyethiopian lang:en",
     "maxResults": "100",
     "fromDate":"201903100000",
-    "toDate":"201904070000"
+    "toDate":"201904070000",
   };
   const options = {
     headers: {
@@ -103,8 +142,8 @@ router.get('/full-archive-search/flyethiopian', async (req, res, next) => {
     });
     return res.status(200).send({
       total: data.results.length,
-      // result: tweets,
-      data,
+      result: tweets,
+      // data,
     });
   } catch (err) {
     console.log(err);
@@ -117,7 +156,7 @@ router.get('/full-archive-search/airasia', async (req, res, next) => {
     "query":"from:airasia lang:en",
     "maxResults": "100",
     "fromDate":"201412290000",
-    "toDate":"201501250000"
+    "toDate":"201501250000",
   };
   const options = {
     headers: {
@@ -141,9 +180,29 @@ router.get('/full-archive-search/airasia', async (req, res, next) => {
     });
     return res.status(200).send({
       total: data.results.length,
-      // result: tweets,
-      data,
+      result: tweets,
+      // data,
     });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err);
+  }
+});
+
+router.post('/search-all', async (req, res, next) => {
+  const tweet_id = req.query.tweet_id;
+  const options = {
+    headers: {
+      "Authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN_PROJECT}`,
+    },
+  };
+  try {
+    const response = await axios.get(
+      `https://api.twitter.com/2/tweets/search/all?query=conversation_id:${tweet_id}&tweet.fields=in_reply_to_user_id,author_id,created_at,conversation_id&max_results=500`,
+      options
+    );
+    const data = response.data;
+    return res.status(200).send(data);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
