@@ -62,6 +62,8 @@ router.post('/full-archive-search', async (req, res, next) => {
         tweet: i.text,
         name: i.user.name,
         username: i.user.screen_name,
+        fromDate: `${req.body.fromYear}-${req.body.fromMonth}-${req.body.fromDate}T00:00:00-07:00`,
+        toDate: `${req.body.toYear}-${req.body.toMonth}-${req.body.toDate}T00:00:00-07:00`,
       };
     });
     return res.status(200).send({
@@ -191,6 +193,8 @@ router.get('/full-archive-search/airasia', async (req, res, next) => {
 
 router.post('/search-all', async (req, res, next) => {
   const tweet_id = req.query.tweet_id;
+  const start_time = req.query.start_time;
+  const end_time = req.query.end_time;
   const options = {
     headers: {
       "Authorization": `Bearer ${process.env.TWITTER_BEARER_TOKEN_PROJECT}`,
@@ -198,7 +202,7 @@ router.post('/search-all', async (req, res, next) => {
   };
   try {
     const response = await axios.get(
-      `https://api.twitter.com/2/tweets/search/all?query=conversation_id:${tweet_id}&tweet.fields=in_reply_to_user_id,author_id,created_at,conversation_id&max_results=500`,
+      `https://api.twitter.com/2/tweets/search/all?query=conversation_id:${tweet_id}&tweet.fields=in_reply_to_user_id,author_id,created_at,conversation_id&max_results=500${start_time !== undefined ? `&start_time=${start_time}T00:00:00-07:00` : ''}${end_time !== undefined ? `&end_time=${end_time}T00:00:00-07:00` : ''}`,
       options
     );
     const data = response.data;
