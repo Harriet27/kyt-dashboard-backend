@@ -228,7 +228,6 @@ router.get('/search-all/in_reply_to_status_id', async (req, res, next) => {
       options
     );
     const data = response.data.data;
-    // return res.status(200).send(data);
     const author_id = data.map((item, index) => {
       return item.author_id;
     });
