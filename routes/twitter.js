@@ -191,7 +191,7 @@ router.get('/full-archive-search/airasia', async (req, res, next) => {
   }
 });
 
-router.post('/search-all/conversation_id', async (req, res, next) => {
+router.get('/search-all/conversation_id', async (req, res, next) => {
   const id = req.query.id;
   const start_time = req.query.start_time;
   const end_time = req.query.end_time;
@@ -213,7 +213,7 @@ router.post('/search-all/conversation_id', async (req, res, next) => {
   }
 });
 
-router.post('/search-all/in_reply_to_status_id', async (req, res, next) => {
+router.get('/search-all/in_reply_to_status_id', async (req, res, next) => {
   const id = req.query.id;
   const start_time = req.query.start_time;
   const end_time = req.query.end_time;
@@ -227,8 +227,29 @@ router.post('/search-all/in_reply_to_status_id', async (req, res, next) => {
       `https://api.twitter.com/2/tweets/search/all?query=in_reply_to_status_id:${id}&tweet.fields=in_reply_to_user_id,author_id,created_at,conversation_id&max_results=500${start_time !== undefined ? `&start_time=${start_time}T00:00:00-07:00` : ''}${end_time !== undefined ? `&end_time=${end_time}T00:00:00-07:00` : ''}`,
       options
     );
-    const data = response.data;
-    return res.status(200).send(data);
+    const data = response.data.data;
+    // return res.status(200).send(data);
+    const author_id = data.map((item, index) => {
+      return item.author_id;
+    });
+    const author_id_str = author_id.join(",");
+    const res_author = await axios.get(
+      `https://api.twitter.com/2/users?ids=${author_id_str}`,
+      options
+    );
+    const author_result = res_author.data.data;
+    const author_arrobj = author_result.map((item, idx) => {
+      return ({
+        author_name: item.username,
+      });
+    });
+    const final_result = data.map((item, idx) => {
+      return ({
+        ...item,
+        ...author_arrobj[idx],
+      });
+    });
+    return res.status(200).send(final_result);
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
