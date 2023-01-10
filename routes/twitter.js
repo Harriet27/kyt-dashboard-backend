@@ -228,27 +228,34 @@ router.get('/search-all/in_reply_to_status_id', async (req, res, next) => {
       options
     );
     const data = response.data.data;
-    const author_id = data.map((item, index) => {
-      return item.author_id;
-    });
-    const author_id_str = author_id.join(",");
-    const res_author = await axios.get(
-      `https://api.twitter.com/2/users?ids=${author_id_str}`,
-      options
-    );
-    const author_result = res_author.data.data;
-    const author_arrobj = author_result.map((item, idx) => {
-      return ({
-        author_name: item.username,
+    if (data !== undefined) {
+      const author_id = data.map((item, index) => {
+        return item.author_id;
       });
-    });
-    const final_result = data.map((item, idx) => {
-      return ({
-        ...item,
-        ...author_arrobj[idx],
+      const author_id_str = author_id.join(",");
+      const res_author = await axios.get(
+        `https://api.twitter.com/2/users?ids=${author_id_str}`,
+        options
+      );
+      const author_result = res_author.data.data;
+      const author_arrobj = author_result.map((item, idx) => {
+        return ({
+          author_name: item.username,
+        });
       });
-    });
-    return res.status(200).send(final_result);
+      const final_result = data.map((item, idx) => {
+        return ({
+          message: "Comments found!",
+          ...item,
+          ...author_arrobj[idx],
+        });
+      });
+      return res.status(200).send(final_result);
+    } else {
+      return res.status(200).send({
+        message: "No comments found!",
+      });
+    }
   } catch (err) {
     console.log(err);
     return res.status(500).send(err);
