@@ -245,12 +245,14 @@ router.get('/search-all/in_reply_to_status_id', async (req, res, next) => {
       });
       const final_result = data.map((item, idx) => {
         return ({
-          message: "Comments found!",
           ...item,
           ...author_arrobj[idx],
         });
       });
-      return res.status(200).send(final_result);
+      return res.status(200).send({
+        message: "Comments found!",
+        result: final_result,
+      });
     } else {
       return res.status(200).send({
         message: "No comments found!",
