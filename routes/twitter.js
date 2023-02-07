@@ -223,10 +223,8 @@ router.get('/search-all/in_reply_to_status_id', async (req, res, next) => {
     },
   };
   try {
-    const response = await axios.get(
-      `https://api.twitter.com/2/tweets/search/all?query=in_reply_to_status_id:${id}&tweet.fields=in_reply_to_user_id,author_id,created_at,conversation_id&max_results=500${start_time !== undefined ? `&start_time=${start_time}T00:00:00-07:00` : ''}${end_time !== undefined ? `&end_time=${end_time}T00:00:00-07:00` : ''}`,
-      options
-    );
+    const url = `https://api.twitter.com/2/tweets/search/all?query=in_reply_to_status_id:${id}&tweet.fields=in_reply_to_user_id,author_id,created_at,conversation_id&max_results=500${start_time !== undefined ? `&start_time=${start_time}T00:00:00-07:00` : ''}${end_time !== undefined ? `&end_time=${end_time}T00:00:00-07:00` : ''}`;
+    const response = await axios.get(url, options);
     const data = response.data.data;
     if (data !== undefined) {
       const author_id = data.map((item, index) => {
@@ -243,9 +241,18 @@ router.get('/search-all/in_reply_to_status_id', async (req, res, next) => {
           author_name: item.username,
         });
       });
+      const convertDate = (date) => {
+        return new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+      };
       const final_result = data.map((item, idx) => {
         return ({
-          ...item,
+          text: item.text,
+          in_reply_to_user_id: item.in_reply_to_user_id,
+          created_at: convertDate(item.created_at),
+          conversation_id: item.conversation_id,
+          id: item.id,
+          edit_history_tweet_ids: item.edit_history_tweet_ids,
+          author_id: item.author_id,
           ...author_arrobj[idx],
         });
       });
