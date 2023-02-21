@@ -242,7 +242,12 @@ router.get('/search-all/in_reply_to_status_id', async (req, res, next) => {
         });
       });
       const convertDate = (date) => {
-        return new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+        const dateOnly = new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }); // 29 March 2019
+        const dateAndTime = new Date(date).toLocaleString(); // 29/3/2019, 3:42:05 am
+        const timestamp = dateAndTime.split(", ")[1]; // 3:42:05 am
+        const timeOnly = timestamp.split(" ")[0]; // 3:42:05
+        const capitalisedAMPM = timestamp.split(" ")[1].toUpperCase(); // AM
+        return `${dateOnly}, ${timeOnly} ${capitalisedAMPM}`;
       };
       const final_result = data.map((item, idx) => {
         return ({
